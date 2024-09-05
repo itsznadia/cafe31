@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <div id="root"></div>
+</body>
+<!-- This setup is not suitable for production. -->
+<!-- Only use it in development! -->
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script async src="https://ga.jspm.io/npm:es-module-shims@1.7.0/dist/es-module-shims.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react?dev",
+    "react-dom/client": "https://esm.sh/react-dom/client?dev"
+  }
+}
+</script>
+<script type="text/babel" data-type="module">
+import React, { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { useState, useEffect } from "react";
+  
+
+function RecipeCard({recipe, handleRecepiCard}){
+  const {recipe_image, recipe_id, recipe_name, short_description, ingredients,
+  preparing_time, calories} = recipe;
+  
+  return(
+    <>
+      <div className="w-1/2 p-2 border m-2">
+        <img className="w-full h-52 rounded-lg" src={recipe_image} alt="" />
+        <h1 className="text-xl font-bold pt-2">{recipe_name}</h1>
+        <p className="pt-2 pb-2">{short_description}</p>
+        <hr/>
+        <h3 className="pt-2 font-semibold">Indredients: {ingredients.length}</h3>
+        <ul className="p-2">
+          {
+            ingredients.map(ingred => <li >*{ingredients}</li> )
+          }
+        </ul>
+        <hr/>
+        <div className="p-2 flex justify-between">
+          <p>{preparing_time}</p>
+          <p>{calories} calories</p>
+        </div>
+        <div className="p-2">
+          <button onClick={()=> handleRecepiCard(recipe, recipe_id)} className="bg-lime-400 p-2 rounded-lg mr-4 want-to-cook">Want to Cook</button>
+          </div>
+        
+      </div>
+   </>
+  )
+}
+
+function RecipeCardSection(id){
+
+  const [recepi, setRecepi] = useState([]);
+  const [cookingrecepi, setCookingrecepi] = useState([]);
+  const [preparing, SetPreparing] = useState(0);
+  const [calories, setCalories] = useState(0);
+
+  const handleRecepiCard = (recepiCard) => {
+    const newRecepi = [...recepi, recepiCard];
+    setRecepi(newRecepi);
+   
+   
+  }
+
+  const handleCookingRecepi = (cookingRecepi, time, calorie, id) => {
+    const newCookingRecepi = [...cookingrecepi, cookingRecepi];
+    setCookingrecepi(newCookingRecepi);
+    SetPreparing(preparing + time);
+    setCalories(calories + calorie);
+   
+    const removeWantToCook = recepi.filter(recepi => recepi.recipe_id !== id);
+    setRecepi(removeWantToCook);
+    
+  }
+
+  
+
+  const recipes = [
+  {
+    "recipe_image": "https://olo-images-live.imgix.net/96/96050f4ce2d040d19526703837bebf8b.jpg?auto=format%2Ccompress&q=60&cs=tinysrgb&w=1200&h=800&fit=fill&fm=png32&bg=transparent&s=7c391a3217deaf4dd29594e989ae55fe",
+    "recipe_id": "001",
+    "recipe_name": "Chicken Alfredo",
+    "short_description": "A creamy, rich pasta dish with tender chicken and a Parmesan cheese sauce.",
+    "ingredients": [
+      "500 g chicken breast",
+      "100 g Parmesan cheese"
+    ],
+    "preparing_time": "30 minutes",
+    "preparing":30,
+    "calories": 650
+  },
+  {
+    "recipe_image": "https://food-images.files.bbci.co.uk/food/recipes/sachas_stir-fry_17077_16x9.jpg",
+    "recipe_id": "002",
+    "recipe_name": "Veggie Stir-Fry",
+    "short_description": "A colorful mix of fresh vegetables stir-fried with a savory sauce.",
+    "ingredients": [
+      "1 red bell pepper, sliced",
+      "150 g snap peas"
+    ],
+    "preparing_time": "20 minutes",
+    "preparing":20,
+    "calories": 350
+  }
+];
+
+
+  
+  return(
+    <>
+   
+    <div className="max-w-screen-lg m-auto mt-10 mb-20">
+        <div className="flex justify-between">
+            <div className="w-2/3 flex justify-between border-2 p-2">
+                 {
+                  recipes.map(recipe => <RecipeCard recipe={recipe}
+                  handleRecepiCard={handleRecepiCard}
+                  />)
+                 }
+            </div>  
+             {/*Cook And Cooking table*/}  
+            <div className="w-1/3 ml-2 ">
+                <div className="text-center border-2 p-6" >
+                    <h1 className="text-xl pb-2">Want to cook: {recepi.length}</h1>
+                    <hr/>
+                    <div className="flex pt-2">
+                      <div className="w-1/2 flex justify-between">
+                        <p>Name: </p>
+                        <p >Time: </p>
+                      </div>
+                      <div className="w-1/2">
+                      
+                      </div>
+                    </div>
+                      {/*want to cook List added*/} 
+                      <div>
+                          <div>
+                            {
+                              recepi.map(recepi => <div className="flex justify-between mt-2 mb-2">
+                                  <p className=" text-sm ">{recepi.recipe_name}</p>
+                                  <p className=" text-sm ">{recepi.preparing_time}</p>
+                                  <button onClick={()=> handleCookingRecepi(recepi, recepi.preparing, recepi.calories, recepi.recipe_id)} className="bg-lime-400 p-1 rounded-lg want-to-cook text-sm">Preparing</button>
+                                </div>)
+                            }
+                          </div>
+                      </div>
+                      {/*want to cook List added end*/} 
+                    <h1 className="text-xl pb-2 mt-20">Currently cooking: {cookingrecepi.length} </h1>
+                    <hr/>
+                    <div className="flex justify-between pt-2">
+                      <p>Name: </p>
+                      <p>Time: </p>
+                      <p>Calories:</p>
+                    </div>
+                    {/*Currently cooking: List added*/} 
+                    <div>
+                          <div>
+                            {
+                              cookingrecepi.map(recepiCook => <div className="flex justify-between mt-2 mb-2">
+                                  <p className=" text-sm ">{recepiCook.recipe_name}</p>
+                                  <p className=" text-sm ">{recepiCook.preparing_time}</p>
+                                  <p className=" text-sm ">{recepiCook.calories}</p>
+                                </div>)
+                            }
+                          </div>
+                      </div>
+                    {/*Currently cooking: List end*/} 
+                    <div className="flex justify-between mt-20 ">
+                      <div>
+                        <p>Total Time = </p>
+                        <p>{preparing}</p>
+                      </div>
+                      <div>
+                        <p>Total Calories = </p>
+                        <p>{calories}</p>
+                      </div>
+                    </div>
+                </div>
+           </div>
+        </div>
+    </div>
+      
+    </>
+  )
+}
+
+
+
+
+function OurRecipes (){
+  return(
+  <>
+  <div className="text-center mt-8">
+    <h1 className="text-2xl font-bold">Our Recipes</h1>
+    <p className="mt-2">Lorem ipsum dolor sit amet consectetur. Proin et feugiat senectus vulputate netus pharetra rhoncus. Eget
+     <br/> urna volutpat curabitur elementum mauris aenean neque. 
+</p>
+  </div>
+  </>
+  )
+}
+
+
+
+function BannerSection(){
+  return(
+    <>
+      <div className="max-w-screen-lg m-auto mt-4">
+          <div className="bannerSection rounded-lg">
+              <div className="text-center p-36 bannerSection2">
+                  <h1 className="text-white text-4xl font-bold">Discover an exceptional cooking class <br/> tailored for you!</h1>
+                  <p className="text-white mt-4">Learn and Master Basic Programming, Data Structures, Algorithm, OOP, Database and solve 500+ coding
+                    problems to become an exceptionally well world-class Programmer.</p>
+                  <br/>
+                  <button className="bg-lime-400 p-2 rounded-lg mr-4">Explore Now</button>
+                  <button className="border border-white p-2 rounded-lg text-white">Our Feedback</button>
+              </div>
+          </div>
+      </div>
+    </>
+  )
+}
+
+
+function Header (){
+
+  return(
+    <>
+     {/*Header/NavBar*/}  
+      <div className="max-w-screen-lg m-auto flex justify-between p-4">
+          <div>
+              <h1 className=" text-2xl  font-bold ">Recipe Calories</h1>
+          </div>
+          {/**/}  
+          <div >
+              <ul className="flex mt-2">
+                <li className="mr-4">Home </li>
+                <li className="mr-4">Recipes</li>
+                <li className="mr-4">About</li>
+                <li >Search</li>
+              </ul>
+          </div>
+          {/**/}  
+          <div className=" flex justify-center">
+              <input className="bg-slate-200 rounded-2xl p-1 "  type="search" placeholder="search" />
+              <span className="ml-2 profile text-blue-900 "><ion-icon name="person-circle-outline"></ion-icon></span>
+          </div>
+      </div>
+    </>
+  )
+}
+
+let App = function MyApp() {
+
+
+
+  return (
+  <>
+    <Header />
+    <BannerSection />
+    <OurRecipes />
+    <RecipeCardSection />
+  </>
+  );
+}
+
+
+const root = createRoot(document.getElementById('root'));
+root.render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
+</script>
+<style>
+* {
+  box-sizing: border-box;
+}
+.profile ion-icon{
+  width:30px;
+  height: 30px;
+}
+.bannerSection{
+  background-image: url(https://www.shutterstock.com/image-photo/chef-hands-cooking-meat-steak-600nw-2110894133.jpg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  text-shadow: 5px 20px 30px  #020202;
+}
+.want-to-cook:hover{
+  background-color: rgb(0, 241, 109);
+}
+</style>
+</html>
